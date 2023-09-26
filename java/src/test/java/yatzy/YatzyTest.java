@@ -1,114 +1,256 @@
 package yatzy;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
 
-public class YatzyTest {
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-    @Test
-    public void chance_scores_sum_of_all_dice() {
-        int expected = 15;
-        int actual = Yatzy.chance(2, 3, 4, 5, 1);
-        assertEquals(expected, actual);
-        assertEquals(16, Yatzy.chance(3, 3, 4, 5, 1));
+class YatzyTest {
+
+    private static Stream<Arguments> provideArgsForTestChance() {
+        return Stream.of(
+                Arguments.of(new Roll(1, 1, 3, 3, 6), 14),
+                Arguments.of(new Roll(4, 5, 5, 6, 1), 21),
+                Arguments.of(new Roll(1, 2, 3, 4, 5), 15));
     }
 
-    @Test
-    public void yatzy_scores_50() {
-        int expected = 50;
-        int actual = Yatzy.yatzy(4, 4, 4, 4, 4);
-        assertEquals(expected, actual);
-        assertEquals(50, Yatzy.yatzy(6, 6, 6, 6, 6));
-        assertEquals(0, Yatzy.yatzy(6, 6, 6, 6, 3));
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestChance")
+    void testChance(final Roll roll, final int expected) {
+
+        final var score = Yatzy.chance(roll);
+
+        assertThat(score).isEqualTo(expected);
     }
 
-    @Test
-    public void test_1s() {
-        assertTrue(Yatzy.ones(1, 2, 3, 4, 5) == 1);
-        assertEquals(2, Yatzy.ones(1, 2, 1, 4, 5));
-        assertEquals(0, Yatzy.ones(6, 2, 2, 4, 5));
-        assertEquals(4, Yatzy.ones(1, 2, 1, 1, 1));
+    private static Stream<Arguments> provideArgsForTestYatzy() {
+        return Stream.of(
+                Arguments.of(new Roll(1, 1, 1, 1, 1), 50),
+                Arguments.of(new Roll(1, 1, 1, 1, 5), 0));
     }
 
-    @Test
-    public void test_2s() {
-        assertEquals(4, Yatzy.twos(1, 2, 3, 2, 6));
-        assertEquals(10, Yatzy.twos(2, 2, 2, 2, 2));
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestYatzy")
+    void testYatzy(final Roll roll, final int expected) {
+
+        final var score = Yatzy.yatzy(roll);
+
+        assertThat(score).isEqualTo(expected);
     }
 
-    @Test
-    public void test_threes() {
-        assertEquals(6, Yatzy.threes(1, 2, 3, 2, 3));
-        assertEquals(12, Yatzy.threes(2, 3, 3, 3, 3));
+    private static Stream<Arguments> provideArgsForTestOnes() {
+        return Stream.of(
+                Arguments.of(new Roll(1, 2, 3, 4, 5), 1),
+                Arguments.of(new Roll(3, 2, 3, 4, 5), 0),
+                Arguments.of(new Roll(1, 2, 1, 1, 1), 4));
     }
 
-    @Test
-    public void fours_test() {
-        assertEquals(12, new Yatzy(4, 4, 4, 5, 5).fours());
-        assertEquals(8, new Yatzy(4, 4, 5, 5, 5).fours());
-        assertEquals(4, new Yatzy(4, 5, 5, 5, 5).fours());
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestOnes")
+    void testOnes(final Roll roll, final int expected) {
+
+        final var score = Yatzy.ones(roll);
+
+        assertThat(score).isEqualTo(expected);
     }
 
-    @Test
-    public void fives() {
-        assertEquals(10, new Yatzy(4, 4, 4, 5, 5).fives());
-        assertEquals(15, new Yatzy(4, 4, 5, 5, 5).fives());
-        assertEquals(20, new Yatzy(4, 5, 5, 5, 5).fives());
+    private static Stream<Arguments> provideArgsForTestTwos() {
+        return Stream.of(
+                Arguments.of(new Roll(1, 2, 2, 2, 5), 6),
+                Arguments.of(new Roll(1, 2, 3, 4, 5), 2),
+                Arguments.of(new Roll(1, 3, 3, 4, 5), 0));
     }
 
-    @Test
-    public void sixes_test() {
-        assertEquals(0, new Yatzy(4, 4, 4, 5, 5).sixes());
-        assertEquals(6, new Yatzy(4, 4, 6, 5, 5).sixes());
-        assertEquals(18, new Yatzy(6, 5, 6, 6, 5).sixes());
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestTwos")
+    void testTwos(final Roll roll, final int expected) {
+
+        final var score = Yatzy.twos(roll);
+
+        assertThat(score).isEqualTo(expected);
     }
 
-    @Test
-    public void one_pair() {
-        assertEquals(6, Yatzy.score_pair(3, 4, 3, 5, 6));
-        assertEquals(10, Yatzy.score_pair(5, 3, 3, 3, 5));
-        assertEquals(12, Yatzy.score_pair(5, 3, 6, 6, 5));
+    private static Stream<Arguments> provideArgsForTestThrees() {
+        return Stream.of(
+                Arguments.of(new Roll(1, 2, 3, 4, 5), 3),
+                Arguments.of(new Roll(1, 2, 2, 4, 5), 0),
+                Arguments.of(new Roll(1, 3, 3, 3, 5), 9));
     }
 
-    @Test
-    public void two_Pair() {
-        assertEquals(16, Yatzy.two_pair(3, 3, 5, 4, 5));
-        assertEquals(16, Yatzy.two_pair(3, 3, 5, 5, 5));
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestThrees")
+    void testThrees(final Roll roll, final int expected) {
+
+        final var score = Yatzy.threes(roll);
+
+        assertThat(score).isEqualTo(expected);
     }
 
-    @Test
-    public void three_of_a_kind() {
-        assertEquals(9, Yatzy.three_of_a_kind(3, 3, 3, 4, 5));
-        assertEquals(15, Yatzy.three_of_a_kind(5, 3, 5, 4, 5));
-        assertEquals(9, Yatzy.three_of_a_kind(3, 3, 3, 3, 5));
+    private static Stream<Arguments> provideArgsForTestFours() {
+        return Stream.of(
+                Arguments.of(new Roll(1, 2, 4, 4, 5), 8),
+                Arguments.of(new Roll(1, 2, 3, 2, 5), 0),
+                Arguments.of(new Roll(1, 4, 4, 4, 4), 16));
     }
 
-    @Test
-    public void four_of_a_knd() {
-        assertEquals(12, Yatzy.four_of_a_kind(3, 3, 3, 3, 5));
-        assertEquals(20, Yatzy.four_of_a_kind(5, 5, 5, 4, 5));
-        assertEquals(9, Yatzy.three_of_a_kind(3, 3, 3, 3, 3));
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestFours")
+    void testFours(final Roll roll, final int expected) {
+
+        final var score = Yatzy.fours(roll);
+
+        assertThat(score).isEqualTo(expected);
     }
 
-    @Test
-    public void smallStraight() {
-        assertEquals(15, Yatzy.smallStraight(1, 2, 3, 4, 5));
-        assertEquals(15, Yatzy.smallStraight(2, 3, 4, 5, 1));
-        assertEquals(0, Yatzy.smallStraight(1, 2, 2, 4, 5));
+    private static Stream<Arguments> provideArgsForTestFives() {
+        return Stream.of(
+                Arguments.of(new Roll(1, 2, 5, 5, 5), 15),
+                Arguments.of(new Roll(1, 2, 3, 4, 5), 5),
+                Arguments.of(new Roll(1, 2, 3, 4, 2), 0));
     }
 
-    @Test
-    public void largeStraight() {
-        assertEquals(20, Yatzy.largeStraight(6, 2, 3, 4, 5));
-        assertEquals(20, Yatzy.largeStraight(2, 3, 4, 5, 6));
-        assertEquals(0, Yatzy.largeStraight(1, 2, 2, 4, 5));
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestFives")
+    void testFives(final Roll roll, final int expected) {
+
+        final var score = Yatzy.fives(roll);
+
+        assertThat(score).isEqualTo(expected);
     }
 
-    @Test
-    public void fullHouse() {
-        assertEquals(18, Yatzy.fullHouse(6, 2, 2, 2, 6));
-        assertEquals(0, Yatzy.fullHouse(2, 3, 4, 5, 6));
+    private static Stream<Arguments> provideArgsForTestSixes() {
+        return Stream.of(
+                Arguments.of(new Roll(1, 2, 3, 4, 6), 6),
+                Arguments.of(new Roll(1, 2, 6, 6, 5), 12),
+                Arguments.of(new Roll(1, 2, 3, 4, 5), 0));
     }
+
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestSixes")
+    void testSixes(final Roll roll, final int expected) {
+
+        final var score = Yatzy.sixes(roll);
+
+        assertThat(score).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> provideArgsForTestPair() {
+        return Stream.of(
+                Arguments.of(new Roll(1, 2, 3, 4, 5), 0),
+                Arguments.of(new Roll(3, 3, 3, 4, 4), 6),
+                Arguments.of(new Roll(1, 1, 6, 2, 6), 2),
+                Arguments.of(new Roll(3, 3, 3, 4, 1), 6),
+                Arguments.of(new Roll(3, 3, 3, 3, 1), 6));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestPair")
+    void testPair(final Roll roll, final int expected) {
+
+        final var score = Yatzy.pair(roll);
+
+        assertThat(score).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> provideArgsForTestTwoPairs() {
+        return Stream.of(
+                Arguments.of(new Roll(1, 1, 2, 3, 3), 8),
+                Arguments.of(new Roll(1, 1, 2, 3, 4), 0),
+                Arguments.of(new Roll(1, 1, 2, 2, 2), 6),
+                Arguments.of(new Roll(3, 3, 3, 3, 1), 0));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestTwoPairs")
+    void testTwoPairs(final Roll roll, final int expected) {
+
+        final var score = Yatzy.twoPairs(roll);
+
+        assertThat(score).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> provideArgsForTestThreeOfAKind() {
+        return Stream.of(
+                Arguments.of(new Roll(3, 3, 3, 4, 5), 9),
+                Arguments.of(new Roll(3, 3, 4, 5, 6), 0),
+                Arguments.of(new Roll(3, 3, 3, 3, 1), 9));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestThreeOfAKind")
+    void testThreeOfAKind(final Roll roll, final int expected) {
+
+        final var score = Yatzy.threeOfAKind(roll);
+
+        assertThat(score).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> provideArgsForTestFourOfAKind() {
+        return Stream.of(
+                Arguments.of(new Roll(2, 2, 2, 2, 5), 8),
+                Arguments.of(new Roll(2, 2, 2, 5, 5), 0),
+                Arguments.of(new Roll(2, 2, 2, 2, 2), 8));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestFourOfAKind")
+    void testFourOfAKind(final Roll roll, final int expected) {
+
+        final var score = Yatzy.fourOfAKind(roll);
+
+        assertThat(score).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> provideArgsForTestSmallStraight() {
+        return Stream.of(
+                Arguments.of(new Roll(1, 2, 3, 4, 5), 15),
+                Arguments.of(new Roll(1, 2, 3, 4, 3), 0),
+                Arguments.of(new Roll(2, 3, 4, 5, 6), 0));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestSmallStraight")
+    void testSmallStraight(final Roll roll, final int expected) {
+
+        final var score = Yatzy.smallStraight(roll);
+
+        assertThat(score).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> provideArgsForTestLargeStraight() {
+        return Stream.of(
+                Arguments.of(new Roll(1, 2, 3, 4, 5), 0),
+                Arguments.of(new Roll(1, 2, 3, 4, 3), 0),
+                Arguments.of(new Roll(2, 3, 4, 5, 6), 20));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestLargeStraight")
+    void testLargeStraight(final Roll roll, final int expected) {
+
+        final var score = Yatzy.largeStraight(roll);
+
+        assertThat(score).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> provideArgsForTestFullHouse() {
+        return Stream.of(
+                Arguments.of(new Roll(1, 1, 2, 2, 2), 8),
+                Arguments.of(new Roll(2, 2, 3, 3, 4), 0),
+                Arguments.of(new Roll(4, 4, 4, 4, 4), 0),
+                Arguments.of(new Roll(4, 4, 4, 4, 2), 0));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideArgsForTestFullHouse")
+    void testFullHouse(final Roll roll, final int expected) {
+
+        final var score = Yatzy.fullHouse(roll);
+
+        assertThat(score).isEqualTo(expected);
+    }
+
 }
