@@ -21,8 +21,8 @@ class RollTest {
     }
 
     @Test
-    void testGetMapCountByValue() {
-        final var map = roll.getMapCountByValue();
+    void testGetMapOccurencesByDice() {
+        final var map = roll.getMapOccurencesByDice();
 
         assertThat(map).contains(
                 entry(1, 1),

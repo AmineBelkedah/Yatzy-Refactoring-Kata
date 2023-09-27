@@ -49,7 +49,7 @@ public final class Yatzy {
     }
 
     public static int pair(final Roll roll) {
-        final var map = roll.getMapCountByValue();
+        final var map = roll.getMapOccurencesByDice();
         map.values().removeIf(value -> value < 2);
         if (map.isEmpty()) {
             return 0;
@@ -61,7 +61,7 @@ public final class Yatzy {
     }
 
     public static int twoPairs(final Roll roll) {
-        final var map = roll.getMapCountByValue();
+        final var map = roll.getMapOccurencesByDice();
         map.values().removeIf(value -> value < 2);
         if (map.size() < 2) {
             return 0;
@@ -70,14 +70,14 @@ public final class Yatzy {
     }
 
     public static int threeOfAKind(final Roll roll) {
-        final var map = roll.getMapCountByValue();
+        final var map = roll.getMapOccurencesByDice();
         map.values().removeIf(value -> value < 3);
 
         return map.keySet().stream().findFirst().orElse(0) * 3;
     }
 
     public static int fourOfAKind(final Roll roll) {
-        final var map = roll.getMapCountByValue();
+        final var map = roll.getMapOccurencesByDice();
         map.values().removeIf(value -> value < 4);
 
         return map.keySet().stream().findFirst().orElse(0) * 4;
@@ -97,7 +97,7 @@ public final class Yatzy {
             return 0;
         }
 
-        final var map = roll.getMapCountByValue();
+        final var map = roll.getMapOccurencesByDice();
 
         if (map.containsValue(1)) {
             return 0;

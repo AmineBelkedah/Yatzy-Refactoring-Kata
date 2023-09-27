@@ -17,7 +17,7 @@ public class Roll {
         return diceList.stream().mapToInt(Integer::intValue).sum();
     }
 
-    public Map<Integer, Integer> getMapCountByValue() {
+    public Map<Integer, Integer> getMapOccurencesByDice() {
 
         return diceList.stream().collect(Collectors.toMap(Function.identity(), x -> 1, Integer::sum));
     }
